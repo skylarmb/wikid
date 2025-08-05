@@ -96,8 +96,9 @@ data/
 ### Dependencies
 - `vllm>=0.10.0` - LLM inference server
 - `openai>=1.87.0,<=1.90.0` - API client
-- `rich` - Terminal formatting
-- `libzim` - ZIM file reading (to be added)
+- `rich` - Terminal formatting and markdown rendering
+- `libzim==3.7.0` - ZIM file reading and search ✅
+- `markdownify==1.1.0` - HTML to Markdown conversion ✅
 
 ## Usage Flow
 
@@ -162,13 +163,26 @@ Assistant: [Searches Arch Wiki] → [Retrieves relevant articles] →
 
 ## Progress Tracking
 
-### Session 1 (Current)
+### Session 1 (COMPLETED) 
 - [x] Project planning and documentation
-- [x] Infrastructure review and optimization
-- [ ] ZIM tools implementation (next)
+- [x] Infrastructure review and optimization  
+- [x] ZIM tools implementation and debugging
+- [x] Tool calling system resolution
+- [x] System prompt integration with citations
+- [x] Model optimization (Qwen3-8B-FP8 with hermes parser)
+- [x] Generic project renaming (qwen-server → wikid-server)
 
-### Future Sessions
-- [ ] System prompt integration
-- [ ] Research flow testing
-- [ ] Additional knowledge base integration
-- [ ] Performance optimization
+### Current State: **FULLY FUNCTIONAL** ✅
+- ✅ Offline research assistant working end-to-end
+- ✅ Tool calling with ZIM file search and retrieval
+- ✅ Automatic citation system
+- ✅ HTML→Markdown content conversion
+- ✅ English content filtering
+- ✅ 8K context window with Qwen3-8B-FP8
+
+### Next Session Priorities
+- [ ] **Content chunking system** - split large articles into sections
+- [ ] **Content summarization** - extract key points from long articles  
+- [ ] **Search relevance improvement** - better technical query matching
+- [ ] **Additional knowledge bases** - Wikipedia, Stack Exchange integration
+- [ ] **Performance optimization** - caching, indexing improvements
