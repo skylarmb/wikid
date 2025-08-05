@@ -1,3 +1,0 @@
-[console_scripts]
-qwen-chat = qwen_server.tool_client:main
-qwen-server = qwen_server.server:main

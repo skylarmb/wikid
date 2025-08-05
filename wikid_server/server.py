@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple vLLM server for Qwen3-8B-FP8 model.
+Simple vLLM server for offline research assistant models.
 """
 
 import argparse
@@ -10,7 +10,7 @@ from typing import Optional
 
 
 def start_server(
-    model_name: str = "qwen-community/Qwen3-8B-FP8",
+    model_name: str = "solidrust/Hermes-2-Pro-Llama-3-8B-AWQ",
     host: str = "0.0.0.0",
     port: int = 8000,
     api_key: Optional[str] = None,
@@ -29,7 +29,7 @@ def start_server(
         "--tensor-parallel-size", str(tensor_parallel_size),
         "--gpu-memory-utilization", str(gpu_memory_utilization),
         "--enable-auto-tool-choice",
-        "--tool-call-parser", "pythonic",
+        "--tool-call-parser", "hermes",
     ]
     
     if api_key:
@@ -54,12 +54,12 @@ def start_server(
 def main():
     """Main entry point for the server."""
     parser = argparse.ArgumentParser(
-        description="Start vLLM server for Qwen3-8B-FP8 model"
+        description="Start vLLM server for offline research assistant models"
     )
     parser.add_argument(
         "--model",
-        default="qwen-community/Qwen3-8B-FP8",
-        help="Model name to serve (default: qwen-community/Qwen3-8B-FP8)"
+        default="solidrust/Hermes-2-Pro-Llama-3-8B-AWQ",
+        help="Model name to serve (default: solidrust/Hermes-2-Pro-Llama-3-8B-AWQ)"
     )
     parser.add_argument(
         "--host",
@@ -85,7 +85,7 @@ def main():
         "--max-model-len",
         type=int,
         default=21904,
-        help="Maximum model length (default: 21904, optimized for 16GB VRAM)"
+        help="Maximum model length (default: 21904, optimized for 16GB VRAM with AWQ quantization)"
     )
     parser.add_argument(
         "--tensor-parallel-size",

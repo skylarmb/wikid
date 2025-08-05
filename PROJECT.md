@@ -84,7 +84,7 @@ data/
 
 ### Startup
 ```bash
-uv run qwen-chat
+uv run wikid-chat
 # Expected output: "Found 1 knowledge base: Arch Linux Wiki"
 ```
 

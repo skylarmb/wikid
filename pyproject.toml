@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "qwen-server"
+name = "wikid-server"
 version = "0.1.0"
-description = "Simple vLLM server for Qwen3-8B-FP8 model"
+description = "Offline research assistant with ZIM knowledge bases and vLLM inference"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -19,12 +19,12 @@ dependencies = [
 ]
 
 [project.scripts]
-qwen-server = "qwen_server.server:main"
-qwen-chat = "qwen_server.tool_client:main"
+wikid-server = "wikid_server.server:main"
+wikid-chat = "wikid_server.tool_client:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["qwen_server*"]
+include = ["wikid_server*"]
 
 [tool.uv]
 dev-dependencies = []

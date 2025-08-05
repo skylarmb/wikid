@@ -13,15 +13,15 @@ A fun side project that lets you chat with an AI that can search through offline
 uv sync
 
 # Start the vLLM server (in one terminal)
-uv run qwen-server
+uv run wikid-server
 
 # Chat with your offline assistant (in another terminal)
-uv run qwen-chat
+uv run wikid-chat
 ```
 
 ## What's in the box?
 
-- 🤖 Local AI assistant using Qwen3-8B-FP8 (16gb vram required, or swap in your own model)
+- 🤖 Local AI assistant using Hermes-2-Pro-Llama-3-8B-AWQ (optimized for 16GB VRAM, easily swap models)
 - 📁 Offline knowledge search through ZIM files
 - 💬 Interactive chat with streaming responses
 - 🎨 Markdown rendering in your terminal

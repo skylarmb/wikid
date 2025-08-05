@@ -209,7 +209,7 @@ Your thinking happens privately. Your response is clean and helpful."""
 def interactive_mode(client: OpenAI, model: str, max_tokens: int, temperature: float, 
                     tool_choice: str, stream: bool):
     """Run in interactive mode for continuous conversation."""
-    print("Qwen Chat - Interactive Mode")
+    print("Wikid Chat - Interactive Mode")
     print("Type 'quit', 'exit', or press Ctrl+C to exit")
     print("Type '/tools' to list available tools")
     print("Type '/stream' to toggle streaming mode")
@@ -259,10 +259,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  qwen-chat                        # Start interactive mode with streaming
-  qwen-chat "Hello world"          # One-shot mode (non-streaming)
-  qwen-chat --no-stream            # Interactive mode without streaming  
-  qwen-chat --list-tools           # List available tools
+  wikid-chat                       # Start interactive mode with streaming
+  wikid-chat "Hello world"         # One-shot mode (non-streaming)
+  wikid-chat --no-stream           # Interactive mode without streaming  
+  wikid-chat --list-tools          # List available tools
         """)
     parser.add_argument(
         "message",
@@ -280,7 +280,7 @@ Examples:
     )
     parser.add_argument(
         "--model",
-        default="qwen-community/Qwen3-8B-FP8",
+        default="solidrust/Hermes-2-Pro-Llama-3-8B-AWQ",
         help="Model name (default: %(default)s)"
     )
     parser.add_argument(
