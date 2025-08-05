@@ -4,7 +4,7 @@ An offline research assistant powered by vLLM and ZIM files. Because sometimes y
 
 ## What is this?
 
-A fun side project that lets you chat with an AI that can search through offline knowledge bases (Wikipedia, Stack Exchange, etc.) stored as ZIM files. Built with vLLM for fast local inference and totally vibe-coded with Claude's help.
+A fun side project that lets you chat with an AI that can search through offline knowledge bases (Wikipedia, Stack Exchange, etc.) stored as ZIM files. Built with vLLM for fast local inference and 100% vibe-coded with Claude.
 
 ## Quick Start
 
