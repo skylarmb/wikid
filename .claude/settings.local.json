@@ -3,7 +3,9 @@
     "allow": [
       "WebFetch(domain:docs.vllm.ai)",
       "Bash(uv sync:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(uv run:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

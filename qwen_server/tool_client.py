@@ -99,7 +99,38 @@ def chat_with_tools(
     if tools is None:
         tools = AVAILABLE_TOOLS
     
-    messages = [{"role": "user", "content": message}]
+    # System prompt for the offline research assistant
+    system_prompt = """You are an Arch Linux documentation assistant with access to the Arch Linux Wiki via ZIM files.
+
+CRITICAL: You are responding to users, not showing internal thoughts. Give clean, helpful responses.
+
+ABSOLUTE REQUIREMENTS:
+- Never include your reasoning process in the final response
+- Never explain what you're thinking or planning to do
+- Provide direct, useful answers to user questions  
+- Focus only on English content from the Arch Linux Wiki
+- Skip any foreign language content (French, German, etc.)
+
+Available tools: search_zim, get_zim_entry, list_zim_files, get_zim_suggestions
+
+RESPONSE FORMAT:
+1. Use tools silently (thinking is private)
+2. After getting results, provide a clean user-facing answer
+3. Extract useful English content only
+4. Be helpful and concise
+
+EXAMPLE:
+User: "Show me documentation about systemd"
+Your response: "Here's from the Arch Linux Wiki about systemd: 'systemd is a system and service manager for Linux operating systems. It is the default init system for Arch Linux.'"
+
+NOT: "I need to search... Let me think... The result shows..." 
+
+Your thinking happens privately. Your response is clean and helpful."""
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": message}
+    ]
     
     print(f"User: {message}")
     print("-" * 50)
@@ -228,10 +259,16 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  qwen-chat                    # Start interactive mode with streaming
-  qwen-chat --no-stream        # Interactive mode without streaming  
-  qwen-chat --list-tools       # List available tools
+  qwen-chat                        # Start interactive mode with streaming
+  qwen-chat "Hello world"          # One-shot mode (non-streaming)
+  qwen-chat --no-stream            # Interactive mode without streaming  
+  qwen-chat --list-tools           # List available tools
         """)
+    parser.add_argument(
+        "message",
+        nargs="?",
+        help="Message for one-shot mode (if provided, runs in non-streaming mode and exits)"
+    )
     parser.add_argument(
         "--base-url",
         default="http://localhost:8000/v1",
@@ -290,12 +327,19 @@ Examples:
     try:
         client = create_client(args.base_url, args.api_key)
         
-        # Streaming is enabled by default, disabled with --no-stream
-        stream_enabled = not args.no_stream
-        
-        # Always run in interactive mode
-        interactive_mode(client, args.model, args.max_tokens, 
-                        args.temperature, args.tool_choice, stream_enabled)
+        if args.message:
+            # One-shot mode (always non-streaming)
+            chat_with_tools(
+                client, args.message, args.model, args.max_tokens, 
+                args.temperature, tool_choice=args.tool_choice, stream=False
+            )
+        else:
+            # Interactive mode
+            # Streaming is enabled by default, disabled with --no-stream
+            stream_enabled = not args.no_stream
+            
+            interactive_mode(client, args.model, args.max_tokens, 
+                            args.temperature, args.tool_choice, stream_enabled)
             
     except Exception as e:
         print(f"Error: {e}")

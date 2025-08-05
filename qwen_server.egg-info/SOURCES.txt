@@ -1,8 +1,10 @@
+README.md
 pyproject.toml
 qwen_server/__init__.py
 qwen_server/server.py
 qwen_server/tool_client.py
 qwen_server/tools.py
+qwen_server/zim_tools.py
 qwen_server.egg-info/PKG-INFO
 qwen_server.egg-info/SOURCES.txt
 qwen_server.egg-info/dependency_links.txt

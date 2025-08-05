@@ -9,6 +9,8 @@ import time
 from datetime import datetime
 from typing import Dict, List, Any
 
+from .zim_tools import search_zim, get_zim_entry, list_zim_files, get_zim_suggestions
+
 
 def get_current_weather(location: str, unit: str = "celsius") -> str:
     """
@@ -95,39 +97,84 @@ AVAILABLE_TOOLS = [
     {
         "type": "function",
         "function": {
-            "name": "get_current_weather",
-            "description": "Get the current weather for a specified location",
+            "name": "search_zim",
+            "description": "Search for content across offline ZIM knowledge bases (Wikipedia, Stack Exchange, etc.)",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "location": {
+                    "query": {
                         "type": "string",
-                        "description": "The city and state/country, e.g. 'San Francisco, CA'"
+                        "description": "Search query string"
                     },
-                    "unit": {
+                    "zim_file": {
                         "type": "string",
-                        "enum": ["celsius", "fahrenheit"],
-                        "description": "Temperature unit"
+                        "description": "Optional specific ZIM file to search (filename)"
+                    },
+                    "max_results": {
+                        "type": "integer",
+                        "description": "Maximum number of results to return (default: 10)",
+                        "default": 10
                     }
                 },
-                "required": ["location"]
+                "required": ["query"]
             }
         }
     },
     {
         "type": "function",
         "function": {
-            "name": "calculate_math",
-            "description": "Calculate a mathematical expression",
+            "name": "get_zim_entry",
+            "description": "Retrieve a specific article or page from ZIM knowledge bases",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "expression": {
+                    "title": {
                         "type": "string",
-                        "description": "Mathematical expression to evaluate (e.g., '2 + 2 * 3')"
+                        "description": "Title of the article to retrieve"
+                    },
+                    "zim_file": {
+                        "type": "string",
+                        "description": "Optional specific ZIM file to search (filename)"
                     }
                 },
-                "required": ["expression"]
+                "required": ["title"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "list_zim_files",
+            "description": "List all available offline knowledge bases (ZIM files)",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_zim_suggestions",
+            "description": "Get search suggestions for better discovery of topics",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Query to get suggestions for"
+                    },
+                    "zim_file": {
+                        "type": "string",
+                        "description": "Optional specific ZIM file to search (filename)"
+                    },
+                    "max_suggestions": {
+                        "type": "integer",
+                        "description": "Maximum number of suggestions to return (default: 10)",
+                        "default": 10
+                    }
+                },
+                "required": ["query"]
             }
         }
     },
@@ -163,8 +210,10 @@ def execute_tool_call(tool_name: str, arguments: Dict[str, Any]) -> str:
         Result of the tool execution
     """
     tool_functions = {
-        "get_current_weather": get_current_weather,
-        "calculate_math": calculate_math,
+        "search_zim": search_zim,
+        "get_zim_entry": get_zim_entry,
+        "list_zim_files": list_zim_files,
+        "get_zim_suggestions": get_zim_suggestions,
         "get_current_time": get_current_time,
     }
     
