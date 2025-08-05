@@ -18,6 +18,18 @@ from .tools import AVAILABLE_TOOLS, execute_tool_call
 console = Console()
 
 
+def render_markdown(text: str) -> None:
+    """Render markdown text using rich."""
+    md = Markdown(text)
+    console.print(md)
+
+
+def print_assistant_response(content: str) -> None:
+    """Print assistant response with markdown rendering."""
+    print("Assistant: ", end="")
+    render_markdown(content)
+
+
 def create_client(base_url: str = "http://localhost:8000/v1", api_key: Optional[str] = None) -> OpenAI:
     """Create an OpenAI client for the vLLM server."""
     return OpenAI(
@@ -64,6 +76,11 @@ def stream_response(response_stream):
             print(chunk_content, end="", flush=True)
     
     print()  # New line after streaming
+    
+    # Re-render the complete response with markdown formatting
+    print("\nFormatted response:")
+    render_markdown(content)
+    
     return content
 
 
@@ -105,7 +122,7 @@ def chat_with_tools(
         # Handle non-streaming response
         assistant_message = response.choices[0].message
         assistant_content = assistant_message.content
-        print(f"Assistant: {assistant_content}")
+        print_assistant_response(assistant_content)
     
     # Check for tool calls in the content
     tool_calls = parse_tool_calls_from_text(assistant_content)
@@ -155,7 +172,7 @@ def chat_with_tools(
             stream_response(final_response)
         else:
             final_content = final_response.choices[0].message.content
-            print(f"Assistant: {final_content}")
+            print_assistant_response(final_content)
 
 
 def interactive_mode(client: OpenAI, model: str, max_tokens: int, temperature: float, 
@@ -207,21 +224,14 @@ def interactive_mode(client: OpenAI, model: str, max_tokens: int, temperature: f
 def main():
     """Main entry point for the enhanced tool client."""
     parser = argparse.ArgumentParser(
-        description="Enhanced tool-aware client with streaming support",
+        description="Interactive tool-aware client with streaming support",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  qwen-chat "What time is it?"
-  qwen-chat "Calculate 15 * 23" --stream
-  qwen-chat --interactive --stream
-  qwen-chat --list-tools
+  qwen-chat                    # Start interactive mode with streaming
+  qwen-chat --no-stream        # Interactive mode without streaming  
+  qwen-chat --list-tools       # List available tools
         """)
-    
-    parser.add_argument(
-        "message",
-        nargs="?",
-        help="Message to send to the model (optional in interactive mode)"
-    )
     parser.add_argument(
         "--base-url",
         default="http://localhost:8000/v1",
@@ -255,14 +265,9 @@ Examples:
         help="Tool choice mode (default: %(default)s)"
     )
     parser.add_argument(
-        "--stream",
+        "--no-stream",
         action="store_true",
-        help="Enable streaming responses"
-    )
-    parser.add_argument(
-        "--interactive",
-        action="store_true",
-        help="Run in interactive mode"
+        help="Disable streaming responses (streaming is default)"
     )
     parser.add_argument(
         "--list-tools",
@@ -285,24 +290,12 @@ Examples:
     try:
         client = create_client(args.base_url, args.api_key)
         
-        if args.interactive:
-            interactive_mode(client, args.model, args.max_tokens, 
-                           args.temperature, args.tool_choice, args.stream)
-        else:
-            if not args.message:
-                print("Error: Message required in non-interactive mode")
-                parser.print_help()
-                sys.exit(1)
-                
-            chat_with_tools(
-                client,
-                args.message,
-                args.model,
-                args.max_tokens,
-                args.temperature,
-                tool_choice=args.tool_choice,
-                stream=args.stream,
-            )
+        # Streaming is enabled by default, disabled with --no-stream
+        stream_enabled = not args.no_stream
+        
+        # Always run in interactive mode
+        interactive_mode(client, args.model, args.max_tokens, 
+                        args.temperature, args.tool_choice, stream_enabled)
             
     except Exception as e:
         print(f"Error: {e}")

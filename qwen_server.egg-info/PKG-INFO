@@ -8,3 +8,4 @@ Requires-Dist: vllm>=0.10.0
 Requires-Dist: openai<=1.90.0,>=1.87.0
 Requires-Dist: fastapi
 Requires-Dist: uvicorn
+Requires-Dist: rich
