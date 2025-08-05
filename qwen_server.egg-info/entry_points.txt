@@ -1,4 +1,3 @@
 [console_scripts]
-qwen-client = qwen_server.client:main
+qwen-chat = qwen_server.tool_client:main
 qwen-server = qwen_server.server:main
-qwen-web = qwen_server.web_server:main

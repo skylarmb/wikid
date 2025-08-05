@@ -13,12 +13,12 @@ dependencies = [
     "openai>=1.87.0,<=1.90.0",
     "fastapi",
     "uvicorn",
+    "rich",
 ]
 
 [project.scripts]
 qwen-server = "qwen_server.server:main"
-qwen-client = "qwen_server.client:main"
-qwen-web = "qwen_server.web_server:main"
+qwen-chat = "qwen_server.tool_client:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

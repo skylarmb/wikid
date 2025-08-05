@@ -28,6 +28,8 @@ def start_server(
         "--dtype", dtype,
         "--tensor-parallel-size", str(tensor_parallel_size),
         "--gpu-memory-utilization", str(gpu_memory_utilization),
+        "--enable-auto-tool-choice",
+        "--tool-call-parser", "pythonic",
     ]
     
     if api_key:
