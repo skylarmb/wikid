@@ -42,9 +42,14 @@ def parse_tool_calls_from_text(content: str) -> List[Dict[str, Any]]:
     """Parse tool calls from text content when they're not in structured format."""
     tool_calls = []
     
+    # Debug: Log what we're parsing
+    print(f"[DEBUG] Parsing tool calls from content ({len(content)} chars)")
+    
     # Look for <tool_call> tags
     tool_call_pattern = r'<tool_call>\s*({.*?})\s*</tool_call>'
     matches = re.findall(tool_call_pattern, content, re.DOTALL)
+    
+    print(f"[DEBUG] Found {len(matches)} tool call matches")
     
     for i, match in enumerate(matches):
         try:
@@ -58,8 +63,10 @@ def parse_tool_calls_from_text(content: str) -> List[Dict[str, Any]]:
                 'type': 'function'
             }
             tool_calls.append(tool_call)
-        except json.JSONDecodeError:
-            print(f"Warning: Failed to parse tool call: {match}")
+            print(f"[DEBUG] Successfully parsed tool call: {tool_data.get('name', 'unknown')}")
+        except json.JSONDecodeError as e:
+            print(f"[DEBUG] Warning: Failed to parse tool call: {match}")
+            print(f"[DEBUG] JSON error: {e}")
     
     return tool_calls
 
@@ -87,7 +94,7 @@ def stream_response(response_stream):
 def chat_with_tools(
     client: OpenAI,
     message: str,
-    model: str = "qwen-community/Qwen3-8B-FP8",
+    model: str = "auto",
     max_tokens: int = 512,
     temperature: float = 0.7,
     tools: Optional[List[Dict]] = None,
@@ -99,10 +106,22 @@ def chat_with_tools(
     if tools is None:
         tools = AVAILABLE_TOOLS
     
+    # Auto-detect model if not specified
+    if model == "auto":
+        try:
+            models = client.models.list()
+            if models.data:
+                model = models.data[0].id
+                print(f"[INFO] Using model: {model}")
+            else:
+                model = "default"  # Fallback
+        except Exception:
+            model = "default"  # Fallback if models endpoint fails
+    
     # System prompt for the offline research assistant
     system_prompt = """You are an Arch Linux documentation assistant with access to the Arch Linux Wiki via ZIM files.
 
-CRITICAL: You are responding to users, not showing internal thoughts. Give clean, helpful responses.
+CRITICAL: You are responding to users, not showing internal thoughts. Give clean, helpful responses with proper citations.
 
 ABSOLUTE REQUIREMENTS:
 - Never include your reasoning process in the final response
@@ -110,6 +129,7 @@ ABSOLUTE REQUIREMENTS:
 - Provide direct, useful answers to user questions  
 - Focus only on English content from the Arch Linux Wiki
 - Skip any foreign language content (French, German, etc.)
+- ALWAYS cite your sources by naming the wiki pages you used
 
 Available tools: search_zim, get_zim_entry, list_zim_files, get_zim_suggestions
 
@@ -117,15 +137,27 @@ RESPONSE FORMAT:
 1. Use tools silently (thinking is private)
 2. After getting results, provide a clean user-facing answer
 3. Extract useful English content only
-4. Be helpful and concise
+4. Always end responses with "Sources: [Page Name 1], [Page Name 2]" format
+5. Be helpful and concise
 
-EXAMPLE:
+EXAMPLES:
+User: "How do I install packages?"
+Your response: "Use pacman to install packages: 'pacman -S package_name'. This installs the specified package and its dependencies from the official repositories.
+
+Sources: Package management, Pacman"
+
 User: "Show me documentation about systemd"
-Your response: "Here's from the Arch Linux Wiki about systemd: 'systemd is a system and service manager for Linux operating systems. It is the default init system for Arch Linux.'"
+Your response: "systemd is a system and service manager for Linux operating systems. It is the default init system for Arch Linux and provides parallel startup of system services.
 
-NOT: "I need to search... Let me think... The result shows..." 
+Sources: systemd"
 
-Your thinking happens privately. Your response is clean and helpful."""
+CITATION RULES:
+- Always include "Sources: " followed by page names
+- Use exact wiki page titles from your search results
+- If you use multiple pages, list them separated by commas
+- If no sources were used (rare), write "Sources: None"
+
+Your thinking happens privately. Your response includes proper citations."""
 
     messages = [
         {"role": "system", "content": system_prompt},
@@ -158,6 +190,11 @@ Your thinking happens privately. Your response is clean and helpful."""
     # Check for tool calls in the content
     tool_calls = parse_tool_calls_from_text(assistant_content)
     
+    # Debug: Log tool call detection
+    print(f"\n[DEBUG] Tool calls detected: {len(tool_calls)}")
+    if len(tool_calls) > 0:
+        print(f"[DEBUG] Tool call details: {[tc['function']['name'] for tc in tool_calls]}")
+    
     if tool_calls:
         print("\n" + "=" * 20 + " TOOL CALLS " + "=" * 20)
         
@@ -176,10 +213,18 @@ Your thinking happens privately. Your response is clean and helpful."""
             
             print(f"\n[{i}] Calling tool: {tool_name}")
             print(f"    Arguments: {tool_args}")
+            print(f"    Tool call ID: {tool_call_id}")
             
             # Execute the tool
-            tool_result = execute_tool_call(tool_name, tool_args)
-            print(f"    Result: {tool_result}")
+            try:
+                tool_result = execute_tool_call(tool_name, tool_args)
+                print(f"    Result length: {len(str(tool_result))} characters")
+                # Show first 200 chars of result for logging
+                result_preview = str(tool_result)[:200] + "..." if len(str(tool_result)) > 200 else str(tool_result)
+                print(f"    Result preview: {result_preview}")
+            except Exception as e:
+                print(f"    ERROR: Tool execution failed: {e}")
+                tool_result = f"Error executing tool: {e}"
             
             # Add tool result to messages
             messages.append({
@@ -280,8 +325,8 @@ Examples:
     )
     parser.add_argument(
         "--model",
-        default="solidrust/Hermes-2-Pro-Llama-3-8B-AWQ",
-        help="Model name (default: %(default)s)"
+        default="auto",
+        help="Model name (default: auto-detect from server)"
     )
     parser.add_argument(
         "--max-tokens",

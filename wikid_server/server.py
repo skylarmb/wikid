@@ -10,14 +10,14 @@ from typing import Optional
 
 
 def start_server(
-    model_name: str = "solidrust/Hermes-2-Pro-Llama-3-8B-AWQ",
+    model_name: str = "mistralai/Mistral-7B-Instruct-v0.3",
     host: str = "0.0.0.0",
     port: int = 8000,
     api_key: Optional[str] = None,
     dtype: str = "auto",
-    max_model_len: Optional[int] = 21904,
+    max_model_len: Optional[int] = 8192,
     tensor_parallel_size: int = 1,
-    gpu_memory_utilization: float = 0.85,
+    gpu_memory_utilization: float = 0.9,
 ) -> None:
     """Start the vLLM OpenAI-compatible server."""
     
@@ -29,7 +29,8 @@ def start_server(
         "--tensor-parallel-size", str(tensor_parallel_size),
         "--gpu-memory-utilization", str(gpu_memory_utilization),
         "--enable-auto-tool-choice",
-        "--tool-call-parser", "hermes",
+        "--tool-call-parser", "mistral",
+        "--chat-template", "examples/tool_chat_template_mistral_parallel.jinja",
     ]
     
     if api_key:
@@ -58,8 +59,8 @@ def main():
     )
     parser.add_argument(
         "--model",
-        default="solidrust/Hermes-2-Pro-Llama-3-8B-AWQ",
-        help="Model name to serve (default: solidrust/Hermes-2-Pro-Llama-3-8B-AWQ)"
+        default="mistralai/Mistral-7B-Instruct-v0.3",
+        help="Model name to serve (default: mistralai/Mistral-7B-Instruct-v0.3)"
     )
     parser.add_argument(
         "--host",
@@ -84,8 +85,8 @@ def main():
     parser.add_argument(
         "--max-model-len",
         type=int,
-        default=21904,
-        help="Maximum model length (default: 21904, optimized for 16GB VRAM with AWQ quantization)"
+        default=8192,
+        help="Maximum model length (default: 8192, matches Hermes model max_position_embeddings)"
     )
     parser.add_argument(
         "--tensor-parallel-size",

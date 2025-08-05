@@ -62,7 +62,7 @@ Available tools:
 
 ### File Structure
 ```
-qwen_server/
+wikid_server/
 ├── server.py              # vLLM server with tool calling
 ├── tool_client.py          # Interactive client with markdown
 ├── tools.py               # Current sample tools (to be replaced)

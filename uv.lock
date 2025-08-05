@@ -3042,34 +3042,6 @@ wheels = [
 ]
 
 [[package]]
-name = "qwen-server"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "fastapi" },
-    { name = "libzim" },
-    { name = "markdownify" },
-    { name = "openai" },
-    { name = "rich" },
-    { name = "uvicorn" },
-    { name = "vllm" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastapi" },
-    { name = "libzim" },
-    { name = "markdownify" },
-    { name = "openai", specifier = ">=1.87.0,<=1.90.0" },
-    { name = "rich" },
-    { name = "uvicorn" },
-    { name = "vllm", specifier = ">=0.10.0" },
-]
-
-[package.metadata.requires-dev]
-dev = []
-
-[[package]]
 name = "ray"
 version = "2.48.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4513,6 +4485,34 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/cb/c3/30e2f9c539b8da8b1d76f64012f3b19253271a63413b2d3adb94b143407f/websockets-15.0.1-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:21c1fa28a6a7e3cbdc171c694398b6df4744613ce9b36b1a498e816787e28123", size = 176877, upload-time = "2025-03-05T20:03:37.199Z" },
     { url = "https://files.pythonhosted.org/packages/fa/a8/5b41e0da817d64113292ab1f8247140aac61cbf6cfd085d6a0fa77f4984f/websockets-15.0.1-py3-none-any.whl", hash = "sha256:f7a866fbc1e97b5c617ee4116daaa09b722101d4a3c170c787450ba409f9736f", size = 169743, upload-time = "2025-03-05T20:03:39.41Z" },
 ]
+
+[[package]]
+name = "wikid-server"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "fastapi" },
+    { name = "libzim" },
+    { name = "markdownify" },
+    { name = "openai" },
+    { name = "rich" },
+    { name = "uvicorn" },
+    { name = "vllm" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi" },
+    { name = "libzim" },
+    { name = "markdownify" },
+    { name = "openai", specifier = ">=1.87.0,<=1.90.0" },
+    { name = "rich" },
+    { name = "uvicorn" },
+    { name = "vllm", specifier = ">=0.10.0" },
+]
+
+[package.metadata.requires-dev]
+dev = []
 
 [[package]]
 name = "xformers"
