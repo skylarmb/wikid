@@ -7,40 +7,59 @@ This project implements an offline research assistant that utilizes offline data
 ## Current Status
 
 ### ✅ Completed Infrastructure
-- [x] Basic vLLM server setup with tool calling support
+- [x] Basic vLLM server setup with tool calling support (Qwen3-8B-FP8 with hermes parser)
 - [x] Enhanced command-line client with streaming and markdown rendering
 - [x] Interactive chat interface with rich formatting
-- [x] Tool calling framework with sample tools
+- [x] Tool calling framework - **WORKING** with structured OpenAI format calls
 - [x] Project planning and documentation
+- [x] **ZIM file integration implementation** - Phase 1 complete
+- [x] **System prompt integration** with citation requirements
+- [x] **ZIM file discovery and management** - auto-detect from data/zim/
+- [x] **Full-text search across offline knowledge bases** - with English content filtering
+- [x] **Content retrieval and citation system** - HTML→Markdown conversion
+- [x] **Model optimization** - switched from quantized models to maintain tool calling
+- [x] **Generic naming refactor** - qwen-server → wikid-server for model flexibility
 
-### 🚧 In Progress
-- [ ] ZIM file integration implementation
+### ✅ Completed ZIM Tools
+- [x] `search_zim()` - Full-text search with fallback title matching
+- [x] `get_zim_entry()` - Retrieve specific articles with HTML→Markdown conversion  
+- [x] `list_zim_files()` - Show available knowledge bases with metadata
+- [x] `get_zim_suggestions()` - Get search suggestions (with graceful fallback)
+- [x] **English content filtering** - automatically skip foreign language pages
+- [x] **Markdownify integration** - convert HTML to clean markdown for better parsing
 
-### 📋 Planned Features
-- [ ] System prompt integration for research assistant role
-- [ ] ZIM file discovery and management
-- [ ] Full-text search across offline knowledge bases
-- [ ] Content retrieval and citation system
+### 🚧 Current Issues & Future Work
+- [ ] **Content length optimization** - ZIM articles overwhelm 8K context window
+- [ ] **Content chunking/summarization** - make large articles more manageable
+- [ ] **Improved search relevance** - better matching for technical queries
 
 ## Implementation Plan
 
-### Phase 1: ZIM Integration Foundation
-1. **Add libzim dependency** to pyproject.toml
-2. **Implement ZIM tools** module with core functions:
-   - `search_zim()` - Full-text search across ZIM files
-   - `get_zim_entry()` - Retrieve specific articles/pages
-   - `list_zim_files()` - Show available knowledge bases
-   - `get_zim_suggestions()` - Get search suggestions
+### ✅ Phase 1: ZIM Integration Foundation (COMPLETED)
+1. ✅ **Add libzim dependency** to pyproject.toml
+2. ✅ **Implement ZIM tools** module with core functions:
+   - ✅ `search_zim()` - Full-text search across ZIM files with English filtering
+   - ✅ `get_zim_entry()` - Retrieve specific articles/pages with Markdown conversion
+   - ✅ `list_zim_files()` - Show available knowledge bases with metadata
+   - ✅ `get_zim_suggestions()` - Get search suggestions with graceful fallback
 
-### Phase 2: Research Assistant Configuration
-3. **Add system prompt injection** to conversation flow
-4. **Replace existing tools** with ZIM-focused research tools
-5. **Test with Arch Linux wiki** (available in ./data/zim/)
+### ✅ Phase 2: Research Assistant Configuration (COMPLETED)
+3. ✅ **Add system prompt injection** to conversation flow with citation requirements
+4. ✅ **Replace existing tools** with ZIM-focused research tools  
+5. ✅ **Test with Arch Linux wiki** (available in ./data/zim/)
+6. ✅ **Debug and fix tool calling** - resolved structured vs text-based tool call parsing
 
-### Phase 3: Enhanced Research Experience
-6. **Implement citation system** with source attribution
-7. **Multi-step research flow** (search → retrieve → synthesize)
-8. **Knowledge base discovery** on startup
+### ✅ Phase 3: Enhanced Research Experience (COMPLETED)
+7. ✅ **Implement citation system** with source attribution requirements
+8. ✅ **Multi-step research flow** (search → retrieve → synthesize)
+9. ✅ **Knowledge base discovery** on startup with auto-detection
+10. ✅ **Tool calling optimization** - simplified parameters, no ZIM file guessing
+
+### 🚧 Phase 4: Content Optimization (IN PROGRESS)
+11. ⚠️ **Content length management** - large articles exceed 8K context window
+12. 📋 **Implement content chunking** - break large articles into manageable sections
+13. 📋 **Add content summarization** - extract key information from long articles
+14. 📋 **Improve search relevance** - better matching algorithms for technical content
 
 ## Technical Architecture
 

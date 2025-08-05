@@ -9,18 +9,21 @@ import sys
 from typing import Optional
 
 
+DEFAULT_MODEL = "Qwen/Qwen3-8B-FP8"
+DEFAULT_MEM_UTIL = 0.85
+
 def start_server(
-    model_name: str = "mistralai/Mistral-7B-Instruct-v0.3",
+    model_name: str = DEFAULT_MODEL,
     host: str = "0.0.0.0",
     port: int = 8000,
     api_key: Optional[str] = None,
     dtype: str = "auto",
     max_model_len: Optional[int] = 8192,
     tensor_parallel_size: int = 1,
-    gpu_memory_utilization: float = 0.9,
+    gpu_memory_utilization: float = DEFAULT_MEM_UTIL,
 ) -> None:
     """Start the vLLM OpenAI-compatible server."""
-    
+
     cmd = [
         "vllm", "serve", model_name,
         "--host", host,
@@ -29,20 +32,19 @@ def start_server(
         "--tensor-parallel-size", str(tensor_parallel_size),
         "--gpu-memory-utilization", str(gpu_memory_utilization),
         "--enable-auto-tool-choice",
-        "--tool-call-parser", "mistral",
-        "--chat-template", "examples/tool_chat_template_mistral_parallel.jinja",
+        "--tool-call-parser", "hermes",
     ]
-    
+
     if api_key:
         cmd.extend(["--api-key", api_key])
-    
+
     if max_model_len:
         cmd.extend(["--max-model-len", str(max_model_len)])
-    
+
     print(f"Starting vLLM server for {model_name}...")
     print(f"Server will be available at http://{host}:{port}")
     print(f"Command: {' '.join(cmd)}")
-    
+
     try:
         subprocess.run(cmd, check=True)
     except KeyboardInterrupt:
@@ -59,8 +61,8 @@ def main():
     )
     parser.add_argument(
         "--model",
-        default="mistralai/Mistral-7B-Instruct-v0.3",
-        help="Model name to serve (default: mistralai/Mistral-7B-Instruct-v0.3)"
+        default=DEFAULT_MODEL,
+        help="Model name to serve, default: " + DEFAULT_MODEL
     )
     parser.add_argument(
         "--host",
@@ -97,12 +99,12 @@ def main():
     parser.add_argument(
         "--gpu-memory-utilization",
         type=float,
-        default=0.85,
-        help="GPU memory utilization ratio (default: 0.85)"
+        default=DEFAULT_MEM_UTIL,
+        help="GPU memory utilization ratio, default: 0.85"
     )
-    
+
     args = parser.parse_args()
-    
+
     start_server(
         model_name=args.model,
         host=args.host,

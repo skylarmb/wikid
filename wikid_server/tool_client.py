@@ -133,6 +133,11 @@ ABSOLUTE REQUIREMENTS:
 
 Available tools: search_zim, get_zim_entry, list_zim_files, get_zim_suggestions
 
+TOOL USAGE RULES:
+- NEVER specify zim_file parameter - let tools search all available files automatically
+- Use search_zim for general topics, get_zim_entry for specific known page titles
+- Only provide required parameters (query for search, title for get_entry)
+
 RESPONSE FORMAT:
 1. Use tools silently (thinking is private)
 2. After getting results, provide a clean user-facing answer
@@ -141,13 +146,15 @@ RESPONSE FORMAT:
 5. Be helpful and concise
 
 EXAMPLES:
-User: "How do I install packages?"
-Your response: "Use pacman to install packages: 'pacman -S package_name'. This installs the specified package and its dependencies from the official repositories.
+User: "How do I configure SSH?"
+Tool call: search_zim(query="SSH configuration")
+Your response: "To configure SSH on Arch Linux, edit /etc/ssh/sshd_config and start the service with systemctl.
 
-Sources: Package management, Pacman"
+Sources: OpenSSH, Secure Shell"
 
-User: "Show me documentation about systemd"
-Your response: "systemd is a system and service manager for Linux operating systems. It is the default init system for Arch Linux and provides parallel startup of system services.
+User: "Show me the systemd page"  
+Tool call: get_zim_entry(title="systemd")
+Your response: "systemd is a system and service manager for Linux operating systems...
 
 Sources: systemd"
 
@@ -186,12 +193,39 @@ Your thinking happens privately. Your response includes proper citations."""
         assistant_message = response.choices[0].message
         assistant_content = assistant_message.content
         print_assistant_response(assistant_content)
+        
+        # Debug: Check if response has structured tool calls
+        print(f"[DEBUG] Response has tool_calls: {hasattr(assistant_message, 'tool_calls') and assistant_message.tool_calls is not None}")
+        if hasattr(assistant_message, 'tool_calls') and assistant_message.tool_calls:
+            print(f"[DEBUG] Structured tool calls found: {len(assistant_message.tool_calls)}")
+            for i, tc in enumerate(assistant_message.tool_calls):
+                print(f"[DEBUG] Tool call {i}: {tc.function.name}")
+        else:
+            print("[DEBUG] No structured tool calls in response")
     
-    # Check for tool calls in the content
-    tool_calls = parse_tool_calls_from_text(assistant_content)
+    # Check for structured tool calls first (OpenAI format)
+    structured_tool_calls = []
+    if not stream and hasattr(assistant_message, 'tool_calls') and assistant_message.tool_calls:
+        for tc in assistant_message.tool_calls:
+            structured_tool_calls.append({
+                'id': tc.id,
+                'function': {
+                    'name': tc.function.name,
+                    'arguments': tc.function.arguments
+                },
+                'type': 'function'
+            })
+    
+    # Fallback: Check for tool calls in text content
+    text_tool_calls = parse_tool_calls_from_text(assistant_content)
+    
+    # Use structured tool calls if available, otherwise use text-based
+    tool_calls = structured_tool_calls if structured_tool_calls else text_tool_calls
     
     # Debug: Log tool call detection
-    print(f"\n[DEBUG] Tool calls detected: {len(tool_calls)}")
+    print(f"\n[DEBUG] Structured tool calls: {len(structured_tool_calls)}")
+    print(f"[DEBUG] Text tool calls: {len(text_tool_calls)}")
+    print(f"[DEBUG] Using tool calls: {len(tool_calls)}")
     if len(tool_calls) > 0:
         print(f"[DEBUG] Tool call details: {[tc['function']['name'] for tc in tool_calls]}")
     
